@@ -1,14 +1,41 @@
 import DialogTitle from '@mui/material/DialogTitle'
 import Dialog from '@mui/material/Dialog'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
 
-function CustomerModal ({ open, onClose }){
+/** api */
+import { post as postCustomer } from '@/api/customer'
+import { connect } from 'react-redux'
+import { CircularProgress } from '@mui/material'
+import Button from '@/components/Button'
+import { rules } from '@/utils/form/rules'
+
+function CustomerModal ({
+   open, 
+   onClose,
+   postCustomer,
+   onComplete,
+   loading
+  }){
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: {errors},
+  } = useForm();
   const router = useRouter()
+
   const handleClose = () => {
     onClose()
   }
-  const handleSubmit = () => {
-    onClose()
+  const onSubmit = async(data) => {
+    try{
+      await postCustomer(data)
+      onComplete()
+    }catch(error){
+      console.log('error', error)
+    }
   }
 
   const handlePassport = (event) => {
@@ -29,46 +56,100 @@ function CustomerModal ({ open, onClose }){
       open={open}
     >
       <DialogTitle>Add new customer</DialogTitle>        
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" action={handleSubmit}>
+      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" action={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Name
+            Name *
           </label>
           <input 
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `}
             id="name" 
-            type="text"
+            type="text"            
+            {...register('name', rules.required)}
             />
+            <small className="text-red-600">{errors?.name?.message}</small>
         </div>
         <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Passport
+            Passport number *
           </label>
           <input 
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `} 
             id="passport" 
             type="text"
+            {...register('passport', rules.required)}
             />
+            <small className="text-red-600">{errors?.passport?.message}</small>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Mobile
+            Mobile *
           </label>
           <input 
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `}
             id="phone" 
             type="text"
+            {...register('phone', rules.required)}
             />
+            <small className="text-red-600">{errors?.passport?.message}</small>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
             Passport
           </label>
           <input 
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `} 
             id="passport" 
             type="file"
-            onChange={(event) => handlePassport(event)}
+            {...register('passportDoc')}
           />
         </div>
         <div className="mb-4">
@@ -76,33 +157,74 @@ function CustomerModal ({ open, onClose }){
             Work permit
           </label>
           <input 
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `} 
             id="workpermit" 
             type="file" 
-            onChange={(event) => handleWorkPermit(event)}/>
+            {...register('workpermitDoc')}/>
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
             Family document
           </label>
           <input 
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `}
             id="phone" 
             type="file" 
-            onChange={(event) => handleFamilyDocument(event)}
+            {...register('familyDoc')}
           />
         </div>
         <div className="flex items-center justify-end gap-4">
-          <button className="bg-yellow-700 hover:bg-yellow-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={handleClose}>
+          <Button
+            variant='outlined'
+            onClick={handleClose}
+            disabled= {loading.post}
+            color='yellow'
+          >
             Back
-          </button>
-          <button className="bg-green-700 hover:bg-green-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-            Save
-          </button>
+          </Button>
+          <Button
+            variant='contained'
+            type='submit'
+            disabled= {loading.post}
+          >
+            {loading.post ? <CircularProgress size={25}/> : <span>Save</span>}
+          </Button>
         </div>
       </form>
     </Dialog>
   )
 }
 
-export default CustomerModal
+const mapStateToProps = (state) => ({
+  loading: state.customer.loading
+})
+
+const mapDispatchToProps = {
+  postCustomer
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerModal)

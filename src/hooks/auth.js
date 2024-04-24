@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import axios from '@/lib/axios'
+import axios from '@/utils/axios'
 import { useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -35,20 +35,46 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             })
     }
 
+    // const login = async ({ setErrors, setStatus, ...props }) => {
+    //     await csrf()
+
+    //     setErrors([])
+    //     setStatus(null)
+
+    //     axios
+    //         .post('/login', props)
+    //         .then(() => mutate())
+    //         .catch(error => {
+    //             if (error.response.status !== 422) throw error
+
+    //             setErrors(error.response.data.errors)
+    //         })
+    // }
+
     const login = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
-
-        setErrors([])
-        setStatus(null)
-
-        axios
-            .post('/login', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
-            })
+        try {
+            // Fetch CSRF token
+            await csrf();
+    
+            setErrors([]);
+            setStatus(null);
+    
+            // Send login request
+            const response = await axios.post('/login', props);
+    
+            // Assuming the token is returned in the response as 'token'
+            const token = response.data.token;
+    
+            // Store token in local storage
+            localStorage.setItem('authToken', token);
+    
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                setErrors(error.response.data.errors);
+            } else {
+                throw error;
+            }
+        }
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
