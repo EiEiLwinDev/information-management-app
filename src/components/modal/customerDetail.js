@@ -11,7 +11,7 @@ import { CircularProgress } from '@mui/material'
 import Button from '@/components/Button'
 import { rules } from '@/utils/form/rules'
 
-function CustomerModal ({
+function CustomerDetailModal ({
    open, 
    onClose,
    postCustomer,
@@ -298,4 +298,4 @@ const mapDispatchToProps = {
   postDocument
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CustomerModal)
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerDetailModal)

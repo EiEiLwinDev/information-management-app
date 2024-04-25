@@ -11,7 +11,7 @@ const Button = ({
         items-center 
         px-4 
         py-2 
-        bg-${color}-800 
+        bg-gray-800 
         border 
         border-transparent 
         rounded-md 

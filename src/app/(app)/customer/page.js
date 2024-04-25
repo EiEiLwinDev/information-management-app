@@ -2,6 +2,7 @@
 
 import Header from '@/app/(app)/Header'
 import CustomerModal from '@/components/modal/customer'
+import CustomerDetailModal from '@/components/modal/customerDetail'
 import { DataGrid } from '@mui/x-data-grid'
 import {Box, Stack} from '@mui/material'
 import Button from '@/components/Button'
@@ -16,6 +17,7 @@ function Customer({
   items
 }){
   const [showCustomerModal, setShowCustomerModal] = useState(false)
+  const [showCustomerDetailModal, setShowCustomerDetailModal] = useState(false)
   const [reload, setReload] = useState(false)
 
   useEffect(() => {
@@ -32,15 +34,37 @@ function Customer({
       width: 100,
     },
     {
+      field: 'photo',
+      headerName: 'Photo',
+      width: 150,
+      height: 200,
+      renderCell: (params) => {
+        const documents = params.row.documents;
+        const passport = documents.find((document) => document.type === 'passport');
+        
+        if(passport){
+          return (
+            <img 
+              src={process.env.NEXT_PUBLIC_URL +'/storage/'+ passport.content_url} 
+              alt="photo" 
+              style={{ width: "100%", height: "100%" }} 
+            />
+          );
+        } else {
+          return null; // or any fallback content
+        }
+      },
+    },    
+    {
       field: 'documents',
       headerName: 'Documents',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
       width: 500,
       renderCell: (params) => (
-        <div class="flex py-2 gap-2">          
+        <div className="flex py-2 gap-2">          
             <Button 
-              variant='outlined' 
+              variant='outlined'  
               sx={{
                 paddingY: 0,
                 marginRight: 1
@@ -92,6 +116,10 @@ function Customer({
         <DataGrid
           rows={items}
           columns={columns}
+          rowSelection={false}
+          onRowClick={() => {
+            setShowCustomerDetailModal(true)
+          }}
         />
       </div>
       <CustomerModal
@@ -100,6 +128,14 @@ function Customer({
         onComplete={() => {
           setReload(!reload)
           setShowCustomerModal(false)
+        }}
+      />
+      <CustomerDetailModal
+        open={showCustomerDetailModal}
+        onClose={() => setShowCustomerDetailModal(false)}
+        onComplete={() => {
+          setReload(!reload)
+          setShowCustomerDetailModal(false)
         }}
       />
     </>
