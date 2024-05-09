@@ -1,24 +1,25 @@
 'use client'
-
 import Header from '@/app/(app)/Header'
 import CustomerModal from '@/components/modal/customer'
-import CustomerDetailModal from '@/components/modal/customerDetail'
-import { DataGrid } from '@mui/x-data-grid'
-import {Box, Stack} from '@mui/material'
+import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import Button from '@/components/Button'
 import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 
 /** api */
 import { find as findCustomers } from '@/api/customer'
+import { useRouter } from 'next/navigation'
+import { format } from 'date-fns'
 
 function Customer({
   findCustomers,
-  items
+  items,
+  loading
 }){
+  const router = useRouter()
   const [showCustomerModal, setShowCustomerModal] = useState(false)
-  const [showCustomerDetailModal, setShowCustomerDetailModal] = useState(false)
   const [reload, setReload] = useState(false)
+  const [customer, setCustomer] = useState(null)
 
   useEffect(() => {
     findCustomers()
@@ -26,77 +27,34 @@ function Customer({
 
   const columns = [
     { field: 'id', headerName: 'No.', width: 70 },
-    { field: 'name', headerName: 'Name', width: 100 },
-    { field: 'passport', headerName: 'Passport', width: 100 },
+    { field: 'name', headerName: 'Name', width: 200 },
+    { field: 'passport', headerName: 'Passport', width: 200 },
     {
       field: 'phone',
       headerName: 'Mobile',
-      width: 100,
+      width: 200,
     },
     {
       field: 'photo',
       headerName: 'Photo',
-      width: 150,
-      height: 200,
+      width: 120,
       renderCell: (params) => {
         const documents = params.row.documents;
-        const passport = documents.find((document) => document.type === 'passport');
+        const passport = documents.find((document) => document.type === 'photo');
         
         if(passport){
           return (
             <img 
-              src={process.env.NEXT_PUBLIC_URL +'/storage/'+ passport.content_url} 
+              src={process.env.NEXT_PUBLIC_URL + passport.content_url} 
               alt="photo" 
-              style={{ width: "100%", height: "100%" }} 
+              style={{ width: "100%", height: "100%", padding:5}} 
             />
           );
         } else {
           return null; // or any fallback content
         }
       },
-    },    
-    {
-      field: 'documents',
-      headerName: 'Documents',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 500,
-      renderCell: (params) => (
-        <div className="flex py-2 gap-2">          
-            <Button 
-              variant='outlined'  
-              sx={{
-                paddingY: 0,
-                marginRight: 1
-              }}
-              onClick={() => handleDownload(params.row.passport)}              
-            >
-              passport
-            </Button>          
-            <Button 
-              variant='outlined'
-              sx={{
-                paddingY: 0,
-                marginRight: 1
-              }}
-              onClick={() => handleDownload(params.row.workPermit)}
-            >
-              work permit
-            </Button>          
-            <Button 
-              variant='outlined'
-              sx={{
-                paddingY: 0,
-                marginRight: 1
-              }} 
-              onClick={() => handleDownload(params.row.familyDocument)}
-            >
-              family document
-            </Button>
-        </div>
-       
-      ),
-    },
+    }
   ];
 
   const handleDownload = () => {
@@ -114,11 +72,25 @@ function Customer({
           >Add customer</Button>
         </div>
         <DataGrid
+          autoHeight={true}
+          rowHeight={100}
           rows={items}
+          disableRowSelectionOnClick
+          disable
+          slots={GridToolbar}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+              quickFilterProps: {
+                debounceMs: 500
+              }
+            }
+          }}
           columns={columns}
-          rowSelection={false}
-          onRowClick={() => {
-            setShowCustomerDetailModal(true)
+          loading={loading.get}
+          rowSelectionModel={true}          
+          onRowClick={(row) => {
+            router.push('/customer/' + row.id)
           }}
         />
       </div>
@@ -129,15 +101,7 @@ function Customer({
           setReload(!reload)
           setShowCustomerModal(false)
         }}
-      />
-      <CustomerDetailModal
-        open={showCustomerDetailModal}
-        onClose={() => setShowCustomerDetailModal(false)}
-        onComplete={() => {
-          setReload(!reload)
-          setShowCustomerDetailModal(false)
-        }}
-      />
+      />      
     </>
   )
 }

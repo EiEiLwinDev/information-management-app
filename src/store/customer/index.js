@@ -34,7 +34,7 @@ export const customerSlice = createSlice({
             const { requestId } = action.meta
             if(state.loading.get && state.currentRequestId.get === requestId){
                 state.loading.get = false
-                state.current = action.payload
+                state.current = action.payload.data
                 state.errors = null
                 state.currentRequestId.get = undefined
             }

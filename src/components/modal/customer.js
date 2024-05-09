@@ -30,6 +30,13 @@ function CustomerModal ({
   const router = useRouter()
 
   const handleClose = () => {
+    reset({
+      'name': '',
+      'phone': '',
+      'passport': '',
+      'gender': 'male',
+      'dob': null
+    })
     onClose()
   }
   const onSubmit = async(data) => {
@@ -50,6 +57,14 @@ function CustomerModal ({
         console.log('payload', formData)
         await postDocument(formData)
       }
+      if(data.visaDoc && data.visaDoc.length && URL){
+        const formData = new FormData();
+        formData.append('document', data.visaDoc[0])
+        formData.append('type', 'visa')
+        formData.append('customer_id', response.payload.data.id)
+        console.log('payload', formData)
+        await postDocument(formData)
+      }
       if(data.workpermitDoc && data.workpermitDoc.length && URL){
         const formData = new FormData();
         formData.append('document', data.workpermitDoc[0])
@@ -58,14 +73,29 @@ function CustomerModal ({
         console.log('payload', formData)
         await postDocument(formData)
       }
-      if(data.otherDoc && data.otherDoc.length && URL){
+      if(data.nrcDoc && data.nrcDoc.length && URL){
         const formData = new FormData();
-        formData.append('document', data.otherDoc[0])
-        formData.append('type', 'other')
+        formData.append('document', data.nrcDoc[0])
+        formData.append('type', 'nrc')
         formData.append('customer_id', response.payload.data.id)
         console.log('payload', formData)
         await postDocument(formData)
       }
+      if(data.censusDoc && data.censusDoc.length && URL){
+        const formData = new FormData();
+        formData.append('document', data.censusDoc[0])
+        formData.append('type', 'census')
+        formData.append('customer_id', response.payload.data.id)
+        console.log('payload', formData)
+        await postDocument(formData)
+      }
+      reset({
+        'name': '',
+        'phone': '',
+        'passport': '',
+        'gender': 'male',
+        'dob': null
+      })
       onComplete()
     }catch(error){
       console.log('error', error)
@@ -74,11 +104,11 @@ function CustomerModal ({
 
   return (
     <Dialog 
-      fullScreen 
+      fullWidth
       open={open}
     >
       <DialogTitle>Add new customer</DialogTitle>        
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" action={handleSubmit(onSubmit)}>
+      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8" action={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
             Name *
@@ -129,7 +159,7 @@ function CustomerModal ({
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
-            Mobile *
+            Phone *
           </label>
           <input 
             className={`
@@ -153,7 +183,7 @@ function CustomerModal ({
         </div>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">
-            Gender
+            Gender *
           </label>
           <select 
             className="
@@ -168,12 +198,36 @@ function CustomerModal ({
             leading-tight 
             focus:outline-none 
             focus:shadow-outline"
-            {...register('gender')}
+            {...register('gender', rules.required)}
             >
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
         </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
+            Date of birth *
+          </label>
+          <input             
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `} 
+            type="date"
+            id="photo" 
+            {...register('dob', rules.required)}
+          />
+        </div>
+
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="photo">
             Photo
@@ -221,7 +275,29 @@ function CustomerModal ({
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="visa">
+            Visa
+          </label>
+          <input 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3 
+            text-gray-700 
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline             
+            `} 
+            id="visa" 
+            type="file" 
+            {...register('visaDoc')}/>
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="workpermit">
             Work permit
           </label>
           <input 
@@ -243,8 +319,31 @@ function CustomerModal ({
             {...register('workpermitDoc')}/>
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Other documents
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nrc">
+            NRC
+          </label>
+          <input 
+            className={`
+            shadow 
+            appearance-none 
+            border 
+            rounded 
+            w-full 
+            py-2 
+            px-3
+            text-gray-700
+            leading-tight 
+            focus:outline-none 
+            focus:shadow-outline 
+            `}
+            id="nrc" 
+            type="file" 
+            {...register('nrcDoc')}
+          />  
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="census">
+            Census
           </label>
           <input 
             className={`
@@ -258,19 +357,19 @@ function CustomerModal ({
             text-gray-700 
             leading-tight 
             focus:outline-none 
-            focus:shadow-outline 
-            `}
-            id="phone" 
+            focus:shadow-outline             
+            `} 
+            id="census" 
             type="file" 
-            {...register('otherDoc')}
-          />          
+          {...register('censusDoc')}/>
         </div>
         <div className="flex items-center justify-end gap-4">
           <Button
             variant='outlined'
             onClick={handleClose}
             disabled= {loading.post || docLoading.post}
-            color='yellow'
+            color="secondary"
+            type="button"
           >
             Back
           </Button>
@@ -279,8 +378,7 @@ function CustomerModal ({
             type='submit'
             disabled= {loading.post || docLoading.post}
           >
-            {loading.post || docLoading.post && ( <CircularProgress size={15} color="white"/> ) 
-            } <span>Save</span>
+            Save
           </Button>
         </div>
       </form>

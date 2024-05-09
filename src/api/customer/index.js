@@ -29,7 +29,7 @@ export const patch = createAsyncThunk(
   "customer/patch",
   async({id, data}, { rejectWithValue }) => {
       try{
-          const response = await axiosInstance.get("/api/customers/" + id, data)
+          const response = await axiosInstance.patch("/api/customers/" + id, data)
           return response.data
       }catch(error){
           return rejectWithValue(error.response.data);
@@ -41,7 +41,7 @@ export const remove = createAsyncThunk(
   "customer/delete",
   async(id, { rejectWithValue }) => {
       try{
-          const response = await axiosInstance.get("/api/customers/" + id)
+          const response = await axiosInstance.delete("/api/customers/" + id)
           return response.data
       }catch(error){
           return rejectWithValue(error.response.data);

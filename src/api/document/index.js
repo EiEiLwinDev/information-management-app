@@ -41,7 +41,7 @@ export const remove = createAsyncThunk(
   "document/delete",
   async(id, { rejectWithValue }) => {
       try{
-          const response = await axiosInstance.get("/api/documents/" + id)
+          const response = await axiosInstance.delete("/api/documents/" + id)
           return response.data
       }catch(error){
           return rejectWithValue(error.response.data);
@@ -60,3 +60,16 @@ export const find = createAsyncThunk(
       }
   }
 )
+
+
+export const download = createAsyncThunk(
+    "document/download",
+    async(id, { rejectWithValue }) => {
+        try{
+            const response = await axiosInstance.get("/api/documents/" + id + "/download")
+            return response.data.data
+        }catch(error){
+            return rejectWithValue(error.response.data);
+        }
+    }
+  )
