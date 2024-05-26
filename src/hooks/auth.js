@@ -9,14 +9,19 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
         axios
-            .get('/api/user')
+            .get('http://157.245.199.178/api/user', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer your-token-here', // if needed
+                },
+                withCredentials: true, // Include credentials for CORS
+            })
             .then(res => res.data)
             .catch(error => {
-                if (error.response.status !== 409) throw error
-
-                router.push('/verify-email')
+                if (error.response.status !== 409) throw error;
+                router.push('/verify-email');
             }),
-    )
+    );
 
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
