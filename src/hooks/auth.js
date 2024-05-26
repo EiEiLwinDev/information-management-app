@@ -9,19 +9,13 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
         axios
-            .get('http://157.245.199.178/api/user', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer your-token-here', // if needed
-                },
-                withCredentials: true, // Include credentials for CORS
-            })
+            .get('/api/user')
             .then(res => res.data)
             .catch(error => {
-                if (error.response.status !== 409) throw error;
-                router.push('/verify-email');
+                if (error.response.status !== 409) throw error
+                router.push('/verify-email')
             }),
-    );
+    )
 
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
@@ -61,6 +55,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             // Fetch CSRF token
             await csrf();
     
+            // Clear any previous errors and status
             setErrors([]);
             setStatus(null);
     
@@ -72,15 +67,32 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     
             // Store token in local storage
             localStorage.setItem('authToken', token);
-    
+            
+            // Optionally, you can redirect the user to another page upon successful login
+            // Router.push('/dashboard');
+            
         } catch (error) {
-            if (error.response && error.response.status === 422) {
-                setErrors(error.response.data.errors);
+            if (error.response) {
+                // Server responded with an error status code
+                if (error.response.status === 422) {
+                    // Validation error, set errors
+                    setErrors(error.response.data.errors);
+                } else {
+                    // Other server error, handle appropriately
+                    setStatus({ type: 'error', message: 'An error occurred during login.' });
+                }
+            } else if (error.request) {
+                // The request was made but no response was received
+                setStatus({ type: 'error', message: 'No response received from the server.' });
             } else {
-                throw error;
+                // Something happened in setting up the request that triggered an error
+                setStatus({ type: 'error', message: 'Error setting up the request.' });
             }
+            
+            // Log the error for debugging
+            console.error('Login error:', error);
         }
-    }
+    };
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
         await csrf()
