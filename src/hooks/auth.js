@@ -34,65 +34,47 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             })
     }
 
-    // const login = async ({ setErrors, setStatus, ...props }) => {
-    //     await csrf()
-
-    //     setErrors([])
-    //     setStatus(null)
-
-    //     axios
-    //         .post('/login', props)
-    //         .then(() => mutate())
-    //         .catch(error => {
-    //             if (error.response.status !== 422) throw error
-
-    //             setErrors(error.response.data.errors)
-    //         })
-    // }
-
     const login = async ({ setErrors, setStatus, ...props }) => {
-        try {
-            // Fetch CSRF token
-            await csrf();
+        await csrf()
+
+        setErrors([])
+        setStatus(null)
+
+        axios
+            .post('/login', props)
+            .then(() => localStorage.setItem('authToken',  response.data.toke))
+            .catch(error => {
+                if (error.response.status !== 422) throw error
+
+                setErrors(error.response.data.errors)
+            })
+    }
+
+    // const login = async ({ setErrors, setStatus, ...props }) => {
+    //     try {
+    //         // Fetch CSRF token
+    //         await csrf();
     
-            // Clear any previous errors and status
-            setErrors([]);
-            setStatus(null);
+    //         setErrors([]);
+    //         setStatus(null);
     
-            // Send login request
-            const response = await axios.post('/login', props);
+    //         // Send login request
+    //         const response = await axios.post('/login', props);
     
-            // Assuming the token is returned in the response as 'token'
-            const token = response.data.token;
+    //         // Assuming the token is returned in the response as 'token'
+    //         const token = response.data.token;
     
-            // Store token in local storage
-            localStorage.setItem('authToken', token);
-            
-            // Optionally, you can redirect the user to another page upon successful login
-            // Router.push('/dashboard');
-            
-        } catch (error) {
-            if (error.response) {
-                // Server responded with an error status code
-                if (error.response.status === 422) {
-                    // Validation error, set errors
-                    setErrors(error.response.data.errors);
-                } else {
-                    // Other server error, handle appropriately
-                    setStatus({ type: 'error', message: 'An error occurred during login.' });
-                }
-            } else if (error.request) {
-                // The request was made but no response was received
-                setStatus({ type: 'error', message: 'No response received from the server.' });
-            } else {
-                // Something happened in setting up the request that triggered an error
-                setStatus({ type: 'error', message: 'Error setting up the request.' });
-            }
-            
-            // Log the error for debugging
-            console.error('Login error:', error);
-        }
-    };
+    //         // Store token in local storage
+    //         localStorage.setItem('authToken', token);
+    
+    //     } catch (error) {
+    //         if (error.response && error.response.status === 422) {
+    //             setErrors(error.response.data.errors);
+    //         } else {
+    //             throw error;
+    //         }
+    //     }
+    // }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
         await csrf()
