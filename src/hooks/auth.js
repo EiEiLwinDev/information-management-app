@@ -41,7 +41,10 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         setStatus(null)
 
         axios
-            .post('/login', props)
+            .post('/login', {
+                ...props,
+                _token: document.querySelector('meta[name="csrf-token"]').content
+            })
             .then(() => localStorage.setItem('authToken',  response.data.toke))
             .catch(error => {
                 if (error.response.status !== 422) throw error
