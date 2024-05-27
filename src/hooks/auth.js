@@ -34,50 +34,50 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             })
     }
 
-    const login = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
-
-        setErrors([])
-        setStatus(null)
-
-        axios
-            .post('/login', {
-                ...props,
-                _token: document.querySelector('meta[name="csrf-token"]').content
-            })
-            .then(() => localStorage.setItem('authToken',  response.data.toke))
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
-            })
-    }
-
     // const login = async ({ setErrors, setStatus, ...props }) => {
-    //     try {
-    //         // Fetch CSRF token
-    //         await csrf();
-    
-    //         setErrors([]);
-    //         setStatus(null);
-    
-    //         // Send login request
-    //         const response = await axios.post('/login', props);
-    
-    //         // Assuming the token is returned in the response as 'token'
-    //         const token = response.data.token;
-    
-    //         // Store token in local storage
-    //         localStorage.setItem('authToken', token);
-    
-    //     } catch (error) {
-    //         if (error.response && error.response.status === 422) {
-    //             setErrors(error.response.data.errors);
-    //         } else {
-    //             throw error;
-    //         }
-    //     }
+    //     await csrf()
+
+    //     setErrors([])
+    //     setStatus(null)
+
+    //     axios
+    //         .post('/login', {
+    //             ...props,
+    //             _token: document.querySelector('meta[name="csrf-token"]').content
+    //         })
+    //         .then(() => localStorage.setItem('authToken',  response.data.toke))
+    //         .catch(error => {
+    //             if (error.response.status !== 422) throw error
+
+    //             setErrors(error.response.data.errors)
+    //         })
     // }
+
+    const login = async ({ setErrors, setStatus, ...props }) => {
+        try {
+            // Fetch CSRF token
+            await csrf();
+    
+            setErrors([]);
+            setStatus(null);
+    
+            // Send login request
+            const response = await axios.post('/login', props);
+    
+            // Assuming the token is returned in the response as 'token'
+            const token = response.data.token;
+    
+            // Store token in local storage
+            localStorage.setItem('authToken', token);
+    
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                setErrors(error.response.data.errors);
+            } else {
+                throw error;
+            }
+        }
+    }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
         await csrf()
