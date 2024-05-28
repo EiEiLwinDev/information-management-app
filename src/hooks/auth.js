@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import axios from '@/utils/axios'
+import axiosInstance from '@/utils/axios'
 import { useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -8,7 +8,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const params = useParams()
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
-        axios
+        axiosInstance
             .get('/api/user')
             .then(res => res.data)
             .catch(error => {
@@ -17,14 +17,14 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             }),
     )
     
-    const csrf = () => axios.get('/sanctum/csrf-cookie')
+    const csrf = () => axiosInstance.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
         await csrf()
 
         setErrors([])
 
-        axios
+        axiosInstance
             .post('/register', props)
             .then(() => mutate())
             .catch(error => {
@@ -60,7 +60,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             setErrors([]);
             setStatus(null);
 
-            const response = await axios.post('/login', props);
+            const response = await axiosInstance.post('/login', props);
 
             localStorage.setItem('authToken', response.data.token);
 
@@ -81,7 +81,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         setErrors([])
         setStatus(null)
 
-        axios
+        axiosInstance
             .post('/forgot-password', { email })
             .then(response => setStatus(response.data.status))
             .catch(error => {
@@ -97,7 +97,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         setErrors([])
         setStatus(null)
 
-        axios
+        axiosInstance
             .post('/reset-password', { token: params.token, ...props })
             .then(response =>
                 router.push('/login?reset=' + btoa(response.data.status)),
@@ -110,14 +110,14 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     const resendEmailVerification = ({ setStatus }) => {
-        axios
+        axiosInstance
             .post('/email/verification-notification')
             .then(response => setStatus(response.data.status))
     }
 
     const logout = async () => {
         if (!error) {
-            await axios.post('/logout').then(() => mutate())
+            await axiosInstance.post('/logout').then(() => mutate())
         }
 
         window.location.pathname = '/login'
