@@ -1,12 +1,13 @@
 import axios from 'axios';
 
+// axios.defaults.withCredentials = true;
 const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
     },
     withCredentials: true,
-    withXSRFToken: true
+    withXSRFToken: true,
 });
 
 // Add a request interceptor

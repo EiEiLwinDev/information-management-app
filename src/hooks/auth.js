@@ -16,7 +16,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                 router.push('/verify-email')
             }),
     )
-
+    
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
@@ -55,21 +55,17 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const login = async ({ setErrors, setStatus, ...props }) => {
         try {
-            // Fetch CSRF token
             await csrf();
-    
+
             setErrors([]);
             setStatus(null);
-    
-            // Send login request
+
             const response = await axios.post('/login', props);
-    
-            // Assuming the token is returned in the response as 'token'
-            const token = response.data.token;
-    
-            // Store token in local storage
-            localStorage.setItem('authToken', token);
-    
+
+            localStorage.setItem('authToken', response.data.token);
+
+            // Mutate the user state after login
+            mutate();
         } catch (error) {
             if (error.response && error.response.status === 422) {
                 setErrors(error.response.data.errors);
