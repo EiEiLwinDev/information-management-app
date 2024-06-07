@@ -15,8 +15,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                 if (error.response.status !== 409) throw error
                 router.push('/verify-email')
             }),
-    )
-    
+    )    
     const csrf = () => axiosInstance.get('/sanctum/csrf-cookie', {
         withCredentials: true
     })
@@ -65,7 +64,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             const response = await axiosInstance.post('/login', props, {
                 headers: {
                     accept: 'application/json',
-                    'X-XSRF-TOKEN' : getCookie('XSRF-TOKEN')
+                    // 'X-XSRF-TOKEN' : getCookie('XSRF-TOKEN')
                 },
                 withCredentials: true
             });
