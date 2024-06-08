@@ -15,8 +15,8 @@ function PreviewModal ({
   name
 }){
   const mimeType = mime.lookup(image);
-  // const isImage = mimeType && mimeType?.startsWith('image'); 
-  const isImage = false;
+  const isImage = mimeType && mimeType?.startsWith('image'); 
+  // const isImage = false;
   const isPDF = mimeType === 'application/pdf';
   const handleClose = () => {
     onClose()
