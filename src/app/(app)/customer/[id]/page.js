@@ -110,7 +110,7 @@ function CustomerDetail ({
           <div className="p-4">          
             {photo ? (
               <div className="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-lg text-center overflow-hidden">              
-                <img src={`${process.env.NEXT_PUBLIC_URL + photo.content_url}`} alt='photo' className="rounded-lg" />              
+                <img src={`${process.env.NEXT_PUBLIC_BACKEND_URL + photo.content_url}`} alt='photo' className="rounded-lg" />              
               </div>
             ): (
               <div className="h-48 w-48 rounded-lg flex justify-center items-center text-center border">
@@ -180,7 +180,7 @@ function CustomerDetail ({
                   onClose={() => {
                     setShowPhotoPreviewModal(false)
                   }}
-                  image={process.env.NEXT_PUBLIC_URL + photo.content_url}
+                  image={process.env.NEXT_PUBLIC_BACKEND_URL + photo.content_url}
                   name={capitalize(photo.type)}
                 />
               </div>
@@ -293,7 +293,7 @@ function CustomerDetail ({
                               return updatedShowPreviewModal;
                             });
                           }}
-                          image={process.env.NEXT_PUBLIC_URL + doc.content_url}
+                          image={process.env.NEXT_PUBLIC_BACKEND_URL + doc.content_url}
                           name={capitalize(doc.type)}
                         />
                     </div>

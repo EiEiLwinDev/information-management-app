@@ -45,7 +45,7 @@ function Customer({
         if(passport){
           return (
             <img 
-              src={process.env.NEXT_PUBLIC_URL + passport.content_url} 
+              src={process.env.NEXT_PUBLIC_BACKEND_URL + passport.content_url} 
               alt="photo" 
               style={{ width: "100%", height: "100%", padding:5}} 
             />
