@@ -27,7 +27,7 @@ const Page = () => {
             name,
             email,
             password,
-            password_confirmation: passwordConfirmation,
+            c_password: passwordConfirmation,
             setErrors,
         })
     }

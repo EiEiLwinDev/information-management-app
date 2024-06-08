@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
         'X-Requested-With': 'XMLHttpRequest',
     },
     withCredentials: true,
-    withXSRFToken: true,
+    // withXSRFToken: true,
 });
 
 // Add a request interceptor

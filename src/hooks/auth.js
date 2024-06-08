@@ -16,52 +16,33 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                 router.push('/verify-email')
             }),
     )    
-    const csrf = () => axiosInstance.get('/sanctum/csrf-cookie', {
-        withCredentials: true
-    })
+    const csrf = () => axiosInstance.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
-        await csrf()
 
         setErrors([])
 
         axiosInstance
-            .post('/register', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
-            })
-    }
-
-    // const login = async ({ setErrors, setStatus, ...props }) => {
-    //     await csrf()
-    //     setErrors([])
-    //     setStatus(null)
-    //     axiosInstance
-    //         .post('/login', {
-    //             ...props
-    //         })
-    //         .then(() => localStorage.setItem('authToken',  response.data.toke))
-    //         .catch(error => {
-    //             if (error.response.status !== 422) throw error
-
-    //             setErrors(error.response.data.errors)
-    //         })
-    // }
+        const response = await axiosInstance.post('/api/register', props, {
+            headers: {
+                accept: 'application/json',
+            }
+        });
+        console.log('response', response)
+        localStorage.setItem('authToken', response.data.data.token);
+    }    
 
     const login = async ({ setErrors, setStatus, ...props }) => {
         try {
             setErrors([]);
             setStatus(null);
+
             const response = await axiosInstance.post('/api/login', props, {
                 headers: {
                     accept: 'application/json',
-                },
+                }
             });
-
-            localStorage.setItem('authToken', response.data.token);
+            localStorage.setItem('authToken', response.data.data.token);
             mutate();
         } catch (error) {
             if (error.response && error.response.status === 422) {
@@ -114,14 +95,18 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const logout = async () => {
         if (!error) {
-            await axiosInstance.post('/logout').then(() => mutate())
+            await axiosInstance.post('/api/logout').then(() =>{
+                mutate()
+                localStorage.setItem('authToken', null);
+
+            })
         }
 
         window.location.pathname = '/login'
-    }    
+    }
 
     useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user)
+        if (middleware === 'guest' && redirectIfAuthenticated && user)             
             router.push(redirectIfAuthenticated)
         if (
             window.location.pathname === '/verify-email' &&
