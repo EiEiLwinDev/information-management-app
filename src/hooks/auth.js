@@ -37,14 +37,11 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     // const login = async ({ setErrors, setStatus, ...props }) => {
     //     await csrf()
-
     //     setErrors([])
     //     setStatus(null)
-
-    //     axios
+    //     axiosInstance
     //         .post('/login', {
-    //             ...props,
-    //             _token: document.querySelector('meta[name="csrf-token"]').content
+    //             ...props
     //         })
     //         .then(() => localStorage.setItem('authToken',  response.data.toke))
     //         .catch(error => {
@@ -56,22 +53,15 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const login = async ({ setErrors, setStatus, ...props }) => {
         try {
-            await csrf();
-
             setErrors([]);
             setStatus(null);
-
-            const response = await axiosInstance.post('/login', props, {
+            const response = await axiosInstance.post('/api/login', props, {
                 headers: {
                     accept: 'application/json',
-                    // 'X-XSRF-TOKEN' : getCookie('XSRF-TOKEN')
                 },
-                withCredentials: true
             });
 
             localStorage.setItem('authToken', response.data.token);
-
-            // Mutate the user state after login
             mutate();
         } catch (error) {
             if (error.response && error.response.status === 422) {
@@ -128,7 +118,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         }
 
         window.location.pathname = '/login'
-    }
+    }    
 
     useEffect(() => {
         if (middleware === 'guest' && redirectIfAuthenticated && user)
